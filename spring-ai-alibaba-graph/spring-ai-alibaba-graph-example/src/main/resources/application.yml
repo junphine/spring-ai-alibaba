@@ -34,4 +34,12 @@ spring:
       api-key: ${AI_DASHSCOPE_API_KEY}
       chat:
         options:
-          model: qwen-max-latest
+          model: qwen-max
+
+    vectorstore:
+      mongodb:
+        enabled: true
+
+  data:
+    mongodb:
+      uri: mongodb://127.0.0.1:2701/graph

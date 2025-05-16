@@ -105,7 +105,7 @@ public class BigToolController {
 		}
 
 		allTools.forEach(tool -> documents.add(new Document(IdUtil.fastSimpleUUID(), tool.getDescription(),
-				Map.of(METHOD_NAME, tool.getName(), METHOD_PARAMETER_TYPES, tool.getParameterTypes()))));
+				Map.of(METHOD_NAME, tool.getName(), METHOD_PARAMETER_TYPES, tool.getParameterTypeNames()))));
 
 		vectorStoreService.addDocuments(documents);
 

@@ -23,6 +23,8 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.mongodb.ignite.MongoDBAtlasVectorStore;
+import org.springframework.ai.vectorstore.mongodb.ignite.RawTextEmbeddingModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,13 +32,13 @@ import java.util.List;
 @Service
 public class VectorStoreService {
 
-	private final EmbeddingModel embeddingModel;
+	private final RawTextEmbeddingModel embeddingModel;
 
-	private final VectorStore vectorStore;
+	private final MongoDBAtlasVectorStore vectorStore;
 
-	public VectorStoreService(EmbeddingModel embeddingModel) {
+	public VectorStoreService(RawTextEmbeddingModel embeddingModel, MongoDBAtlasVectorStore vectorStore) {
 		this.embeddingModel = embeddingModel;
-		this.vectorStore = SimpleVectorStore.builder(embeddingModel).build();
+		this.vectorStore = vectorStore; // SimpleVectorStore.builder(embeddingModel).build();
 	}
 
 	public void addDocuments(List<Document> documents) {

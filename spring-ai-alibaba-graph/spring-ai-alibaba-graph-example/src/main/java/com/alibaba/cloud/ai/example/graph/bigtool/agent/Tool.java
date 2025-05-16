@@ -16,6 +16,8 @@
 
 package com.alibaba.cloud.ai.example.graph.bigtool.agent;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 public class Tool {
@@ -49,6 +51,10 @@ public class Tool {
 
 	public Class<?>[] getParameterTypes() {
 		return parameterTypes;
+	}
+
+	public List<String> getParameterTypeNames() {
+		return Arrays.stream(parameterTypes).map(p -> p.getName()).toList();
 	}
 
 	public void setParameterTypes(Class<?>[] parameterTypes) {
