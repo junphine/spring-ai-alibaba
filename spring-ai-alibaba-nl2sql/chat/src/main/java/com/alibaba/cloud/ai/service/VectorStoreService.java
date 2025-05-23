@@ -16,15 +16,21 @@
 package com.alibaba.cloud.ai.service;
 
 import com.alibaba.cloud.ai.analyticdb.AnalyticDbVectorStoreProperties;
-import com.alibaba.cloud.ai.request.SearchRequest;
+import com.alibaba.cloud.ai.request.SearchRequestDto;
 import com.aliyun.gpdb20160503.Client;
 import com.aliyun.gpdb20160503.models.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.mongodb.ignite.MongoDBAtlasVectorStore;
+import org.springframework.ai.vectorstore.mongodb.ignite.MongoDbVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -41,34 +47,21 @@ public class VectorStoreService {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@Autowired
-	@Qualifier("dashscopeEmbeddingModel")
+	@Qualifier("rawTextEmbeddingModel")
 	private EmbeddingModel embeddingModel;
 
 	@Autowired
-	private AnalyticDbVectorStoreProperties analyticDbVectorStoreProperties;
+	private MongoDbVectorStoreProperties mamgoDbVectorStoreProperties;
 
 	@Autowired
-	private Client client;
+	private MongoDBAtlasVectorStore vectorStore;
 
-	/**
-	 * 将文本转换为 Double 类型的向量
-	 */
-	public List<Double> embedDouble(String text) {
-		return convertToDoubleList(embeddingModel.embed(text));
-	}
-
-	/**
-	 * 将文本转换为 Float 类型的向量
-	 */
-	public List<Float> embedFloat(String text) {
-		return convertToFloatList(embeddingModel.embed(text));
-	}
 
 	/**
 	 * 获取向量库中的文档
 	 */
 	public List<Document> getDocuments(String query, String vectorType) {
-		SearchRequest request = new SearchRequest();
+		SearchRequestDto request = new SearchRequestDto();
 		request.setQuery(query);
 		request.setVectorType(vectorType);
 		request.setTopK(100);
@@ -78,98 +71,94 @@ public class VectorStoreService {
 	/**
 	 * 默认 filter 的搜索接口
 	 */
-	public List<Document> searchWithVectorType(SearchRequest searchRequestDTO) {
-		String filter = String.format("jsonb_extract_path_text(metadata, 'vectorType') = '%s'",
+	public List<Document> searchWithVectorType(SearchRequestDto searchRequestDTO) {
+		String filter = String.format("metadata.vectorType = '%s'",
 				searchRequestDTO.getVectorType());
 
-		QueryCollectionDataRequest request = buildBaseRequest(searchRequestDTO).setFilter(filter);
+		searchRequestDTO.setFilterFormatted(filter);
 
-		return executeQuery(request);
+		return executeQuery(searchRequestDTO);
 	}
 
 	/**
 	 * 自定义 filter 的搜索接口
 	 */
-	public List<Document> searchWithFilter(SearchRequest searchRequestDTO) {
-		QueryCollectionDataRequest request = buildBaseRequest(searchRequestDTO)
-			.setFilter(searchRequestDTO.getFilterFormatted());
-		return executeQuery(request);
+	public List<Document> searchWithFilter(SearchRequestDto searchRequestDTO) {
+		searchRequestDTO.setFilterFormatted(searchRequestDTO.getFilterFormatted());
+		return executeFilter(searchRequestDTO);
 	}
 
-	/**
-	 * 构建基础查询请求对象
-	 */
-	private QueryCollectionDataRequest buildBaseRequest(SearchRequest searchRequestDTO) {
-		QueryCollectionDataRequest queryCollectionDataRequest = new QueryCollectionDataRequest()
-			.setDBInstanceId(analyticDbVectorStoreProperties.getDbInstanceId())
-			.setRegionId(analyticDbVectorStoreProperties.getRegionId())
-			.setNamespace(analyticDbVectorStoreProperties.getNamespace())
-			.setNamespacePassword(analyticDbVectorStoreProperties.getNamespacePassword())
-			.setCollection(analyticDbVectorStoreProperties.getCollectName())
-			.setIncludeValues(false)
-			.setMetrics(analyticDbVectorStoreProperties.getMetrics())
-			.setTopK((long) searchRequestDTO.getTopK());
-		if (searchRequestDTO.getQuery() != null) {
-			queryCollectionDataRequest.setVector(embedDouble(searchRequestDTO.getQuery()));
-			queryCollectionDataRequest.setContent(searchRequestDTO.getQuery());
-		}
-		return queryCollectionDataRequest;
-	}
 
 	/**
 	 * 执行实际查询并解析结果
 	 */
-	private List<Document> executeQuery(QueryCollectionDataRequest request) {
+	private List<Document> executeQuery(SearchRequestDto request) {
 		try {
-			QueryCollectionDataResponse response = client.queryCollectionData(request);
+			SearchRequest vecRequest = SearchRequest.builder()
+					.query(request.getQuery())
+					.topK(request.getTopK())
+					.build();
+			List<Document> response = vectorStore.doSimilaritySearch(vecRequest);
 			return parseDocuments(response);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException("向量数据库查询失败: " + e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * 将 float[] 转换为 List<Double>
+	 * 执行实际查询并解析结果
 	 */
-	private List<Double> convertToDoubleList(float[] array) {
-		return IntStream.range(0, array.length)
-			.mapToDouble(i -> (double) array[i])
-			.boxed()
-			.collect(Collectors.toList());
+	private List<Document> executeFilter(SearchRequestDto request) {
+		try {
+			Query query = Query.query(Criteria.where("text").is(request.getVectorType()));
+			query.limit(request.getTopK());
+			MongoTemplate mongoTemplate = vectorStore.<MongoTemplate>getNativeClient().get();
+			List<org.bson.Document> response = mongoTemplate.find(query, org.bson.Document.class,mamgoDbVectorStoreProperties.getCollectName());
+
+			return parseBsonDocuments(response);
+		} catch (Exception e) {
+			throw new RuntimeException("向量数据库查询失败: " + e.getMessage(), e);
+		}
 	}
 
-	/**
-	 * 将 float[] 转换为 List<Float>
-	 */
-	private List<Float> convertToFloatList(float[] array) {
-		return IntStream.range(0, array.length).mapToObj(i -> array[i]).collect(Collectors.toList());
-	}
 
 	/**
 	 * 解析响应数据为 Document 列表
 	 */
-	private List<Document> parseDocuments(QueryCollectionDataResponse response) throws Exception {
-		return response.getBody()
-			.getMatches()
-			.getMatch()
-			.stream()
-			.filter(match -> match.getScore() == null || match.getScore() > 0.1 || match.getScore() == 0.0)
-			.map(match -> {
-				Map<String, String> metadata = match.getMetadata();
-				try {
-					Map<String, Object> metadataJson = OBJECT_MAPPER.readValue(metadata.get(METADATA_FIELD_NAME),
-							new TypeReference<HashMap<String, Object>>() {
-							});
-					metadataJson.put("score", match.getScore());
+	private List<Document> parseDocuments(List<Document> response) throws Exception {
+		return response.stream()
+				.filter(match -> match.getScore() == null || match.getScore() > 0.1 || match.getScore() == 0.0)
+				.map(match -> {
 
-					return new Document(match.getId(), metadata.get(CONTENT_FIELD_NAME), metadataJson);
-				}
-				catch (Exception e) {
-					throw new RuntimeException("解析元数据失败: " + e.getMessage(), e);
-				}
-			})
-			.collect(Collectors.toList());
+					try {
+						Map<String, Object> metadata = match.getMetadata();
+
+						return match;
+					} catch (Exception e) {
+						throw new RuntimeException("解析元数据失败: " + e.getMessage(), e);
+					}
+				})
+				.collect(Collectors.toList());
+	}
+
+	private List<Document> parseBsonDocuments(List<org.bson.Document> response) throws Exception {
+		return response.stream()
+				.filter(match -> match.get("score") == null || match.getDouble("score") > 0.1 || match.getDouble("score") == 0.0)
+				.map(match -> {
+					Map<String, String> metadata = match.get("metadata",Map.class);
+					try {
+						Map<String, Object> metadataJson = OBJECT_MAPPER.readValue(metadata.get(METADATA_FIELD_NAME),
+								new TypeReference<HashMap<String, Object>>() {
+								});
+						metadataJson.put("score", match.getDouble("score"));
+
+						return new Document(match.get("_id").toString(), metadata.get(CONTENT_FIELD_NAME), metadataJson);
+					}
+					catch (Exception e) {
+						throw new RuntimeException("解析元数据失败: " + e.getMessage(), e);
+					}
+				})
+				.collect(Collectors.toList());
 	}
 
 }

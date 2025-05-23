@@ -20,7 +20,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class SearchRequest implements Serializable {
+public class SearchRequestDto implements Serializable {
 
 	private String query;
 

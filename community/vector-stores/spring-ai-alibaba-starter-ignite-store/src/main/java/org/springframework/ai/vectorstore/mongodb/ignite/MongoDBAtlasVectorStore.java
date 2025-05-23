@@ -265,9 +265,9 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 	private Document mapMongoDocument(org.bson.Document mongoDocument) {
 		String id = mongoDocument.getString(ID_FIELD_NAME);
 		String content = mongoDocument.getString(CONTENT_FIELD_NAME);
-		Number vectorScore = (Number)mongoDocument.get(SCORE_FIELD_NAME);
+		Number vectorScore = (Number) mongoDocument.get(SCORE_FIELD_NAME);
 		double score = 0;
-		if(vectorScore!=null){
+		if (vectorScore != null) {
 			score = vectorScore.doubleValue();
 		}
 		Map<String, Object> metadata = mongoDocument.get(METADATA_FIELD_NAME, org.bson.Document.class);

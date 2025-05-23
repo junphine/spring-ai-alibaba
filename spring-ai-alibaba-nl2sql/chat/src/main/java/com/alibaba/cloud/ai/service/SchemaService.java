@@ -17,7 +17,7 @@ package com.alibaba.cloud.ai.service;
 
 import com.alibaba.cloud.ai.dbconnector.BizDataSourceTypeEnum;
 import com.alibaba.cloud.ai.dbconnector.DbConfig;
-import com.alibaba.cloud.ai.request.SearchRequest;
+import com.alibaba.cloud.ai.request.SearchRequestDto;
 import com.alibaba.cloud.ai.schema.ColumnDTO;
 import com.alibaba.cloud.ai.schema.SchemaDTO;
 import com.alibaba.cloud.ai.schema.TableDTO;
@@ -241,7 +241,7 @@ public class SchemaService {
 		}
 
 		for (String tableName : missingTables) {
-			SearchRequest request = new SearchRequest();
+			SearchRequestDto request = new SearchRequestDto();
 			request.setQuery(null);
 			request.setTopK(10);
 			request.setFilterFormatted("jsonb_extract_path_text(metadata, 'vectorType') = '" + vectorType
@@ -275,7 +275,7 @@ public class SchemaService {
 		}
 
 		for (String columnName : missingColumns) {
-			SearchRequest request = new SearchRequest();
+			SearchRequestDto request = new SearchRequestDto();
 			request.setQuery(null);
 			request.setTopK(10);
 			request.setFilterFormatted("jsonb_extract_path_text(metadata, 'vectorType') = '" + vectorType

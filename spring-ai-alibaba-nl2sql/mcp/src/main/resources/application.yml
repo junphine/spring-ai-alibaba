@@ -3,13 +3,14 @@ server:
 spring:
   ai:
     dashscope:
-      api-key:
+      api-key: sk-268354693ec84f74b32a6c237df49cbd
     mcp:
       server:
         name: xiyan-server    # MCP服务器名称
         version: 0.0.1           # 服务器版本号
     vectorstore:
       analytic:
+        enabled: false
         collectName: chatBi
         regionId: cn-hangzhou
         dbInstanceId:
@@ -21,15 +22,25 @@ spring:
         defaultSimilarityThreshold: 0.75
         accessKeyId:
         accessKeySecret:
+
+      mongodb:
+        enabled: true
+
+    data:
+      mongodb:
+        uri: mongodb://127.0.0.1:2701/graph
+
     openai:
       base-url: https://dashscope.aliyuncs.com/compatible-mode
-      api-key:
+      api-key: sk-268354693ec84f74b32a6c237df49cbd
       model: qwen-max
-chatBi:
-  dbConfig:
-    url:
-    username:
-    password:
-    schema:
-    connection-type: jdbc
-    dialect-type: mysql
+chatbi:
+  dbconfig:
+    url: jdbc:postgresql://localhost:5432/health_db
+    username: postgres
+    password: 332584185
+    connectiontype: jdbc
+    dialecttype: PostgreSQL
+    schema: health
+
+

@@ -29,9 +29,9 @@ spring:
         accessKeySecret:
 chatbi:
   dbconfig:
-    url:
-    username:
-    password:
-    connectiontype:
-    dialecttype:
+    url: jdbc:postgresql://localhost:5432/health_db
+    username: postgres
+    password: 332584185
+    connectiontype: jdbc
+    dialecttype: PostgreSQL
     schema:
