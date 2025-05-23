@@ -16,8 +16,16 @@
 
 package com.alibaba.cloud.ai.example.deepresearch.controller;
 
-import com.alibaba.cloud.ai.graph.*;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.cloud.ai.graph.CompiledGraph;
+import com.alibaba.cloud.ai.graph.OverAllState;
+import com.alibaba.cloud.ai.graph.RunnableConfig;
+import com.alibaba.cloud.ai.graph.StateGraph;
+import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.state.StateSnapshot;
+
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,9 +33,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author yingzi
@@ -49,7 +54,7 @@ public class DeepResearchController {
 			@RequestParam(value = "enable_background_investigation",
 					defaultValue = "true") boolean enableBackgroundInvestigation,
 			@RequestParam(value = "auto_accepted_plan", defaultValue = "true") boolean autoAcceptedPlan,
-			@RequestParam(value = "thread_id", required = false) int threadId) {
+			@RequestParam(value = "thread_id", required = false, defaultValue = "0") Integer threadId) {
 		UserMessage userMessage = new UserMessage(query);
 		Map<String, Object> objectMap = Map.of("enable_background_investigation", enableBackgroundInvestigation,
 				"auto_accepted_plan", autoAcceptedPlan, "messages", List.of(userMessage));
