@@ -130,6 +130,18 @@
 
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-nacos2-mcp-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-nacos2-mcp-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
                 <artifactId>spring-ai-alibaba-starter-nacos-mcp-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -143,6 +155,12 @@
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
                 <artifactId>spring-ai-alibaba-starter-nacos-prompt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-nl2sql</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -167,13 +185,13 @@
 
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-autoconfigure-nacos-mcp-client</artifactId>
+                <artifactId>spring-ai-alibaba-autoconfigure-nacos2-mcp-client</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-autoconfigure-nacos-mcp-server</artifactId>
+                <artifactId>spring-ai-alibaba-autoconfigure-nacos2-mcp-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -189,11 +207,6 @@
                 <artifactId>spring-ai-alibaba-graph-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-graph-studio</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <!-- Spring AI Alibaba Studio -->
             <dependency>
@@ -205,7 +218,7 @@
             <!-- Spring AI Alibaba MCP Nacos -->
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-mcp-nacos</artifactId>
+                <artifactId>spring-ai-alibaba-mcp-nacos2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -359,6 +372,12 @@
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
                 <artifactId>spring-ai-alibaba-starter-tool-calling-yuque</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud.ai</groupId>
+                <artifactId>spring-ai-alibaba-starter-tool-calling-tavilysearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
