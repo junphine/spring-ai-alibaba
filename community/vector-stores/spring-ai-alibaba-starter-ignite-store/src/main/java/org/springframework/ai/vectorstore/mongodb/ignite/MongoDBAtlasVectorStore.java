@@ -164,7 +164,7 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 
 	private final int numCandidates;
 
-	private final float maxDistance;
+	private final float similarityThreshold;
 
 	private final MongoDBAtlasFilterExpressionConverter filterExpressionConverter;
 
@@ -180,7 +180,7 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 		this.vectorIndexName = builder.vectorIndexName;
 		this.pathName = builder.pathName;
 		this.numCandidates = builder.numCandidates;
-		this.maxDistance = builder.maxDistance;
+		this.similarityThreshold = builder.similarityThreshold;
 		this.metadataFieldsToFilter = builder.metadataFieldsToFilter;
 		this.filterExpressionConverter = builder.filterExpressionConverter;
 		this.initializeSchema = builder.initializeSchema;
@@ -310,7 +310,7 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 	}
 
 	@Override
-	protected void doDelete(Filter.Expression filterExpression) {
+	public void doDelete(Filter.Expression filterExpression) {
 		Assert.notNull(filterExpression, "Filter expression must not be null");
 
 		try {
@@ -346,12 +346,12 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 			queryEmbedding = this.embeddingModel.embed(request.getQuery());
 		}
 
-		float maxDistance = this.maxDistance;
+		float similarityThreshold = this.similarityThreshold;
 		if (request.getSimilarityThreshold() > 0) {
-			maxDistance = 1.0f - (float) request.getSimilarityThreshold();
+			similarityThreshold = (float) request.getSimilarityThreshold();
 		}
 		var vectorSearch = new VectorSearchAggregation(queryEmbedding, this.pathName, this.numCandidates,
-				this.vectorIndexName, request.getTopK(), maxDistance, nativeFilterExpressions);
+				this.vectorIndexName, request.getTopK(), similarityThreshold, nativeFilterExpressions);
 		Aggregation aggregation = Aggregation.newAggregation(vectorSearch,
 				Aggregation.addFields()
 					.addField(SCORE_FIELD_NAME)
@@ -404,7 +404,7 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 
 		private int numCandidates = DEFAULT_NUM_CANDIDATES;
 
-		private float maxDistance = Float.MAX_VALUE;
+		private float similarityThreshold = 0;
 
 		private List<String> metadataFieldsToFilter = Collections.emptyList();
 
@@ -472,11 +472,11 @@ public class MongoDBAtlasVectorStore extends AbstractObservationVectorStore impl
 
 		/**
 		 * Sets the max sim distance of candidates for vector search.
-		 * @param maxDistance the max distance of candidates
+		 * @param similarityThreshold the max distance of candidates
 		 * @return the builder instance
 		 */
-		public Builder maxDistance(float maxDistance) {
-			this.maxDistance = maxDistance;
+		public Builder similarityThreshold(float similarityThreshold) {
+			this.similarityThreshold = similarityThreshold;
 			return this;
 		}
 

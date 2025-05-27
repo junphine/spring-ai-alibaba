@@ -17,6 +17,7 @@ package com.alibaba.cloud.ai.service;
 
 import com.alibaba.cloud.ai.dbconnector.BizDataSourceTypeEnum;
 import com.alibaba.cloud.ai.dbconnector.DbConfig;
+import com.alibaba.cloud.ai.request.SchemaInitRequest;
 import com.alibaba.cloud.ai.request.SearchRequestDto;
 import com.alibaba.cloud.ai.schema.ColumnDTO;
 import com.alibaba.cloud.ai.schema.SchemaDTO;
@@ -49,6 +50,17 @@ public class SchemaService {
 
 	private static final Gson gson = new Gson();
 
+	public Boolean init() {
+		SchemaInitRequest initRequest = new SchemaInitRequest();
+		try {
+			initRequest.setDbConfig(dbConfig);
+			return vectorStoreService.schema(initRequest);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * 混合 RAG 查询接口，根据 query + keywords 搜索并构建 Schema
 	 */
@@ -63,11 +75,11 @@ public class SchemaService {
 		processColumnWeights(columnDocumentList, tableDocuments);
 
 		// 初始化列选择器
-		Map<String, Document> weightedColumns = selectWeightedColumns(columnDocumentList, 100);
+		TreeMap<String, Document> weightedColumns = selectWeightedColumns(columnDocumentList, 20);
 		Set<String> foreignKeySet = extractForeignKeyRelations(tableDocuments);
 
 		// 构建表列表
-		List<TableDTO> tableList = buildTableListFromDocuments(tableDocuments);
+		List<TableDTO> tableList = buildTableListFromDocuments(tableDocuments, weightedColumns);
 
 		// 补充缺失的外键对应表
 		expandTableDocumentsWithForeignKeys(tableDocuments, foreignKeySet, "table");
@@ -76,6 +88,7 @@ public class SchemaService {
 		// 将加权列附加到对应的表中
 		attachColumnsToTables(weightedColumns, tableList);
 
+		tableList = tableList.stream().filter(t -> !t.getColumn().isEmpty()).collect(Collectors.toList());
 		// 最终组装 SchemaDTO
 		schemaDTO.setTable(tableList);
 		schemaDTO.setForeignKeys(List.of(new ArrayList<>(foreignKeySet)));
@@ -93,9 +106,10 @@ public class SchemaService {
 		List<Document> tableDocuments = vectorStoreService.getDocuments(query, "table");
 		List<Document> columnDocuments = vectorStoreService.getDocuments(query, "column");
 
-		List<TableDTO> tableList = buildTableListFromDocuments(tableDocuments);
+		List<TableDTO> tableList = buildTableListFromDocuments(tableDocuments, null);
 		attachColumnsToTables(columnDocuments, tableList);
 
+		tableList = tableList.stream().filter(t -> !t.getColumn().isEmpty()).collect(Collectors.toList());
 		schemaDTO.setTable(tableList);
 		return schemaDTO;
 	}
@@ -121,7 +135,9 @@ public class SchemaService {
 	 * 根据关键词获取所有列文档
 	 */
 	public List<List<Document>> getColumnDocumentsByKeywords(List<String> keywords) {
-		return keywords.stream().map(kw -> vectorStoreService.getDocuments(kw, "column")).collect(Collectors.toList());
+		return keywords.stream()
+			.map(kw -> vectorStoreService.getDocuments(kw, "column", 100))
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -136,8 +152,8 @@ public class SchemaService {
 					.filter(table -> table.getMetadata().get("name").equals(column.getMetadata().get("tableName")))
 					.findFirst();
 				matchingTable.ifPresent(tableDoc -> {
-					Double tableScore = (Double) tableDoc.getMetadata().get("score");
-					Double columnScore = (Double) column.getMetadata().get("score");
+					Double tableScore = tableDoc.getScore();
+					Double columnScore = column.getScore();
 					if (tableScore != null && columnScore != null) {
 						column.getMetadata().put("score", columnScore * tableScore);
 					}
@@ -150,8 +166,8 @@ public class SchemaService {
 	/**
 	 * 按照权重选取最多 maxCount 个列
 	 */
-	private Map<String, Document> selectWeightedColumns(List<List<Document>> columnDocumentList, int maxCount) {
-		Map<String, Document> result = new HashMap<>();
+	private TreeMap<String, Document> selectWeightedColumns(List<List<Document>> columnDocumentList, int maxCount) {
+		TreeMap<String, Document> result = new TreeMap<>();
 		int index = 0;
 
 		while (result.size() < maxCount) {
@@ -198,7 +214,8 @@ public class SchemaService {
 	/**
 	 * 从文档中构建表列表
 	 */
-	private List<TableDTO> buildTableListFromDocuments(List<Document> documents) {
+	private List<TableDTO> buildTableListFromDocuments(List<Document> documents,
+			TreeMap<String, Document> weightedColumns) {
 		List<TableDTO> tableList = new ArrayList<>();
 
 		for (Document doc : documents) {
@@ -207,6 +224,13 @@ public class SchemaService {
 
 			dto.setName((String) meta.get("name"));
 			dto.setDescription((String) meta.get("description"));
+
+			if (weightedColumns != null) {
+				String ceil = weightedColumns.ceilingKey(dto.getName());
+				if (ceil == null || !ceil.startsWith(dto.getName())) {
+					continue;
+				}
+			}
 
 			String primaryKeyStr = (String) meta.get("primaryKey");
 			List<String> primaryKeys = new ArrayList<>();
@@ -244,8 +268,8 @@ public class SchemaService {
 			SearchRequestDto request = new SearchRequestDto();
 			request.setQuery(null);
 			request.setTopK(10);
-			request.setFilterFormatted("jsonb_extract_path_text(metadata, 'vectorType') = '" + vectorType
-					+ "' and refdocid = '" + tableName + "'");
+			request.setVectorType(vectorType);
+			request.setFilterFormatted("metadata.vectorType = '" + vectorType + "' and refdocid = '" + tableName + "'");
 			List<Document> docs = vectorStoreService.searchWithFilter(request);
 			if (CollectionUtils.isNotEmpty(docs)) {
 				tableDocuments.addAll(docs);
@@ -278,8 +302,9 @@ public class SchemaService {
 			SearchRequestDto request = new SearchRequestDto();
 			request.setQuery(null);
 			request.setTopK(10);
-			request.setFilterFormatted("jsonb_extract_path_text(metadata, 'vectorType') = '" + vectorType
-					+ "' and refdocid = '" + columnName + "'");
+			request.setVectorType(vectorType);
+			request
+				.setFilterFormatted("metadata.vectorType = '" + vectorType + "' and refdocid = '" + columnName + "'");
 			List<Document> docs = vectorStoreService.searchWithFilter(request);
 			if (CollectionUtils.isNotEmpty(docs)) {
 				for (Document doc : docs) {

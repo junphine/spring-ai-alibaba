@@ -67,7 +67,11 @@ public class MongoDBAtlasVectorStoreAutoConfiguration {
 		}
 
 		if (properties.getDefaultSimilarityThreshold() >= 0.0) {
-			builder.maxDistance(1.0f - properties.getDefaultSimilarityThreshold());
+			builder.similarityThreshold(properties.getDefaultSimilarityThreshold());
+		}
+
+		if (properties.getInitializeSchema() != null) {
+			builder.initializeSchema(properties.getInitializeSchema());
 		}
 
 		if (properties.getCollectName() != null) {
@@ -77,6 +81,7 @@ public class MongoDBAtlasVectorStoreAutoConfiguration {
 		if (properties.getNamespace() != null) {
 			builder.pathName(properties.getNamespace());
 		}
+		builder.filterExpressionConverter(new MongoDBAtlasFilterExpressionConverter());
 		return builder.build();
 	}
 

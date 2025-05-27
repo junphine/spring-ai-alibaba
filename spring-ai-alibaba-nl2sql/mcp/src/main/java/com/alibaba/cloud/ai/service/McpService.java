@@ -25,13 +25,24 @@ public class McpService {
 	@Autowired
 	private Nl2SqlService nl2SqlService;
 
+	@Tool(description = "根据输入问题生成对应数据库的查询sql语句")
+	public String nl2Sql(String input) throws Exception {
+		String sql = nl2SqlService.nl2sql(input);
+		return sql;
+	}
+
 	/**
 	 * 从数据库中获取问题所需要的数据
 	 * @return 从数据库中获取问题所需要的数据
 	 */
 	@Tool(description = "从数据库中获取问题所需要的数据")
-	public String nl2Sql(String input) throws Exception {
+	public String nl2SqlAndExecute(String input) throws Exception {
 		String sql = nl2SqlService.nl2sql(input);
+		return nl2SqlService.executeSql(sql);
+	}
+
+	@Tool(description = "在数据库中执行sql语句")
+	public String executeSql(String sql) throws Exception {
 		return nl2SqlService.executeSql(sql);
 	}
 

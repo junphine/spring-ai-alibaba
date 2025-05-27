@@ -55,7 +55,9 @@ public class MongoDbVectorStoreProperties extends CommonVectorStoreProperties {
 
 	private Integer defaultTopK = -1;
 
-	private Float defaultSimilarityThreshold = -1.0f;
+	private Float defaultSimilarityThreshold = 0.0f;
+
+	private Boolean initializeSchema = false;
 
 	public String getCollectName() {
 		return collectName;
@@ -177,6 +179,14 @@ public class MongoDbVectorStoreProperties extends CommonVectorStoreProperties {
 		params.put("readTimeout", this.readTimeout);
 		params.put("userAgent", this.userAgent);
 		return params;
+	}
+
+	public Boolean getInitializeSchema() {
+		return initializeSchema;
+	}
+
+	public void setInitializeSchema(Boolean initializeSchema) {
+		this.initializeSchema = initializeSchema;
 	}
 
 }

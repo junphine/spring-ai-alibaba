@@ -54,7 +54,13 @@ public class Nl2SqlService {
 	@Autowired
 	private DbConfig dbConfig;
 
+	private boolean inited = false;
+
 	public String nl2sql(String query) throws Exception {
+		if (!inited) {
+			// schemaService.init();
+			inited = true;
+		}
 		List<Document> evidenceDocuments = vectorStoreService.getDocuments(query, "evidence");
 		List<String> evidences = evidenceDocuments.stream().map(Document::getText).collect(Collectors.toList());
 		SchemaDTO schemaDTO = select(query, evidences);
@@ -100,7 +106,9 @@ public class Nl2SqlService {
 		expressionList.addAll(dateTimeList);
 
 		List<String> prompts = PromptHelper.buildMixSqlGeneratorPrompt(query, dbConfig, schemaDTO, evidenceList);
-		return MarkdownParser.extractRawText(aiService.callWithSystemPrompt(prompts.get(0), prompts.get(1))).trim();
+		var aiResp = aiService.callWithSystemPrompt(prompts.get(0), prompts.get(1));
+
+		return MarkdownParser.extractRawText(aiResp).trim();
 	}
 
 	public SchemaDTO fineSelect(SchemaDTO schemaDTO, String query, List<String> evidenceList) {

@@ -34,4 +34,4 @@ chatbi:
     password: 332584185
     connectiontype: jdbc
     dialecttype: PostgreSQL
-    schema:
+    schema: 中文表

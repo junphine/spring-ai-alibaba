@@ -25,7 +25,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperationCon
 import org.springframework.lang.NonNull;
 
 record VectorSearchAggregation(Object embeddings, String path, int numCandidates, String index, int count,
-		float maxDistance, String filter) implements AggregationOperation {
+		float similarityThreshold, String filter) implements AggregationOperation {
 
 	@SuppressWarnings("null")
 	@Override
@@ -33,7 +33,7 @@ record VectorSearchAggregation(Object embeddings, String path, int numCandidates
 		var vectorSearch = new Document("queryVector", this.embeddings).append("path", this.path)
 			.append("numCandidates", this.numCandidates)
 			.append("index", this.index)
-			.append("$max", this.maxDistance)
+			.append("scoreThreshold", this.similarityThreshold)
 			.append("limit", this.count);
 		if (!this.filter.isEmpty()) {
 			vectorSearch.append("filter", Document.parse(this.filter));
