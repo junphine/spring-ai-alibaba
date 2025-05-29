@@ -26,7 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>spring-ai-alibaba-nl2sql-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

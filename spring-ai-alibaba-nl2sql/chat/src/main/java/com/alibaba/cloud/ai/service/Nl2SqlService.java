@@ -58,7 +58,7 @@ public class Nl2SqlService {
 
 	public String nl2sql(String query) throws Exception {
 		if (!inited) {
-			// schemaService.init();
+			schemaService.init();
 			inited = true;
 		}
 		List<Document> evidenceDocuments = vectorStoreService.getDocuments(query, "evidence");

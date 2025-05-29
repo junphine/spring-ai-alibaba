@@ -8,7 +8,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>mcp</artifactId>
+    <artifactId>spring-ai-alibaba-nl2sql-mcp</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>chat</artifactId>
+            <artifactId>spring-ai-alibaba-nl2sql-chat</artifactId>
             <version>${spring-ai-alibaba.version}</version>
             <scope>compile</scope>
         </dependency>
