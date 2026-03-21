@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.BooleanTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.annotation.MapperScan;
@@ -58,9 +59,12 @@ public class MybatisPlusConfig {
 			public void customize(MybatisConfiguration configuration) {
 				TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
 				// 全局注册 Boolean 类型处理器
-				typeHandlerRegistry.register(boolean.class, JdbcType.SMALLINT, new BooleanToSmallIntHandler());
 				typeHandlerRegistry.register(new BooleanToSmallIntHandler());
 				typeHandlerRegistry.register(Boolean.class, null, new BooleanToSmallIntHandler());
+				typeHandlerRegistry.register(boolean.class, null, new BooleanToSmallIntHandler());
+				typeHandlerRegistry.register(boolean.class, JdbcType.SMALLINT, new BooleanToSmallIntHandler());
+				typeHandlerRegistry.register(boolean.class, JdbcType.BOOLEAN, new BooleanTypeHandler());
+				typeHandlerRegistry.register(Boolean.class, JdbcType.BOOLEAN, new BooleanTypeHandler());
 			}
 		};
 	}
