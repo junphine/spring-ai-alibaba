@@ -57,7 +57,7 @@
             AND name LIKE CONCAT('%', #{name}, '%')
         </if>
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- 根据评估器ID统计评估器版本数量 -->

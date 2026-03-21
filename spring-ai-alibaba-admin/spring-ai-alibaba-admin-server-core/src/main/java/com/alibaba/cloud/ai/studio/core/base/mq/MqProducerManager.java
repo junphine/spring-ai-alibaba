@@ -40,7 +40,7 @@ import java.util.function.Consumer;
  * @since 1.0.0.3
  */
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class MqProducerManager {
 

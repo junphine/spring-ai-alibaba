@@ -44,7 +44,7 @@
             AND (tags = #{tag} OR tags LIKE CONCAT('%,', #{tag}, ',%') OR tags LIKE CONCAT(#{tag}, ',%') OR tags LIKE CONCAT('%,', #{tag}))
         </if>
         ORDER BY id DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- 查询Prompt模板总数 -->

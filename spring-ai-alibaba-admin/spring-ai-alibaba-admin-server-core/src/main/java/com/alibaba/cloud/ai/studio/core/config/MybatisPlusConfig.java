@@ -17,9 +17,16 @@
 package com.alibaba.cloud.ai.studio.core.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,4 +51,17 @@ public class MybatisPlusConfig {
 		return interceptor;
 	}
 
+	@Bean
+	public ConfigurationCustomizer mybatisConfigurationCustomizer() {
+		return new ConfigurationCustomizer() {
+			@Override
+			public void customize(MybatisConfiguration configuration) {
+				TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+				// 全局注册 Boolean 类型处理器
+				typeHandlerRegistry.register(boolean.class, JdbcType.SMALLINT, new BooleanToSmallIntHandler());
+				typeHandlerRegistry.register(new BooleanToSmallIntHandler());
+				typeHandlerRegistry.register(Boolean.class, null, new BooleanToSmallIntHandler());
+			}
+		};
+	}
 }

@@ -48,7 +48,7 @@
             </if>
         </where>
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- 查询评测集总数 -->

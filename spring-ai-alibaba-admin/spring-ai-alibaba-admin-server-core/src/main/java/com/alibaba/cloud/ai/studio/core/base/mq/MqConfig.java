@@ -55,7 +55,7 @@ public class MqConfig {
 	 * @return Configured document index producer
 	 * @throws ClientException if producer creation fails
 	 */
-	@Bean
+	//@Bean
 	public Producer documentIndexProducer(ClientConfiguration clientConfiguration,
 			MqConfigProperties mqConfigProperties) throws ClientException {
 		ClientServiceProvider provider = ClientServiceProvider.loadService();

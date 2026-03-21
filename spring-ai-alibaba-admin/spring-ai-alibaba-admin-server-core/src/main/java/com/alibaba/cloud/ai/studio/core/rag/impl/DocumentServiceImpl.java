@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.studio.core.rag.impl;
 
+import com.alibaba.cloud.ai.studio.core.base.mq.RedissonProducerManager;
 import com.alibaba.cloud.ai.studio.runtime.domain.knowledgebase.CreateDocumentRequest;
 import com.alibaba.cloud.ai.studio.runtime.domain.knowledgebase.DeleteChunkRequest;
 import com.alibaba.cloud.ai.studio.runtime.domain.knowledgebase.DeleteDocumentRequest;
@@ -55,7 +56,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.rocketmq.client.apis.producer.Producer;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -82,7 +83,7 @@ import java.util.Optional;
 public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, DocumentEntity> implements DocumentService {
 
 	/** Message queue producer manager for handling async operations */
-	private final MqProducerManager mqProducerManager;
+	private final RedissonProducerManager mqProducerManager;
 
 	/** Message queue configuration properties */
 	private final MqConfigProperties mqConfigProperties;
@@ -97,19 +98,18 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, DocumentEnt
 	private final IndexPipeline knowledgeBaseIndexPipeline;
 
 	/** Producer for document indexing messages */
-	@Qualifier("documentIndexProducer")
-	private final Producer documentIndexProducer;
+	//@Qualifier("documentIndexProducer")
+	private final String documentIndexProducer = "documentIndexProducer";
 
-	public DocumentServiceImpl(MqProducerManager mqProducerManager, MqConfigProperties mqConfigProperties,
+	public DocumentServiceImpl(RedissonProducerManager mqProducerManager, MqConfigProperties mqConfigProperties,
 			KnowledgeBaseService knowledgeBaseService, VectorStoreFactory vectorStoreFactory,
-			IndexPipeline knowledgeBaseIndexPipeline,
-			@Qualifier("documentIndexProducer") Producer documentIndexProducer) {
+			IndexPipeline knowledgeBaseIndexPipeline) {
 		this.mqProducerManager = mqProducerManager;
 		this.mqConfigProperties = mqConfigProperties;
 		this.knowledgeBaseService = knowledgeBaseService;
 		this.vectorStoreFactory = vectorStoreFactory;
 		this.knowledgeBaseIndexPipeline = knowledgeBaseIndexPipeline;
-		this.documentIndexProducer = documentIndexProducer;
+
 	}
 
 	/**

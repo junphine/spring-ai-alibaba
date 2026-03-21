@@ -39,6 +39,9 @@ public class MqConfigProperties {
 	/** Message sending timeout in milliseconds */
 	private int sendMessageTimeoutMs = 3000;
 
+	/** Message poll timeout in milliseconds */
+	private int pollTimeoutMs = 3000;
+
 	/** Maximum number of cached messages */
 	private int maxCacheMessageCount = 1024;
 

@@ -55,7 +55,7 @@
             AND (tags = #{tag} OR tags LIKE CONCAT('%,', #{tag}, ',%') OR tags LIKE CONCAT(#{tag}, ',%') OR tags LIKE CONCAT('%,', #{tag}))
         </if>
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- 查询Prompt总数 -->
@@ -140,7 +140,7 @@
             AND (p.tags = #{tag} OR p.tags LIKE CONCAT('%,', #{tag}, ',%') OR p.tags LIKE CONCAT(#{tag}, ',%') OR p.tags LIKE CONCAT('%,', #{tag}))
         </if>
         ORDER BY p.create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
 </mapper>

@@ -205,7 +205,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
 
 		LambdaQueryWrapper<WorkspaceEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(WorkspaceEntity::getAccountId, context.getAccountId())
-			.ne(WorkspaceEntity::getStatus, CommonStatus.DELETED.getValue());
+			.ne(WorkspaceEntity::getStatus, CommonStatus.DELETED.getStatus());
 		if (StringUtils.isNotBlank(query.getName())) {
 			queryWrapper.like(WorkspaceEntity::getName, query.getName());
 		}
@@ -255,7 +255,7 @@ public class WorkspaceServiceImpl extends ServiceImpl<WorkspaceMapper, Workspace
 
 		LambdaQueryWrapper<WorkspaceEntity> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(WorkspaceEntity::getAccountId, uid)
-			.ne(WorkspaceEntity::getStatus, CommonStatus.DELETED.getValue())
+			.ne(WorkspaceEntity::getStatus, CommonStatus.DELETED.getStatus())
 			.orderByAsc(WorkspaceEntity::getId)
 			.last("limit 1");
 

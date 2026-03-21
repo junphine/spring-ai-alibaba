@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0.0.3
  */
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class MqConsumerManager {
 

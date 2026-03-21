@@ -46,7 +46,7 @@
         FROM dataset_version
         WHERE dataset_id = #{datasetId}
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- Query dataset version count -->

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.apache.ibatis.type.JdbcType;
 
 import java.util.Date;
 
@@ -41,6 +42,7 @@ public class ProviderEntity {
 
 	private String provider;
 
+	@TableField(value = "enable", jdbcType = JdbcType.SMALLINT)
 	private Boolean enable;
 
 	/**

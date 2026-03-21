@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.studio.core.rag.indices;
 
+import com.alibaba.cloud.ai.studio.core.base.mq.RedissonConsumerManager;
 import com.alibaba.cloud.ai.studio.runtime.enums.DocumentIndexStatus;
 import com.alibaba.cloud.ai.studio.runtime.domain.knowledgebase.Document;
 import com.alibaba.cloud.ai.studio.runtime.domain.knowledgebase.KnowledgeBase;
@@ -55,7 +56,7 @@ public class DocumentIndexHandler implements MqConsumerHandler<MqMessage> {
 	private final MqConfigProperties mqConfigProperties;
 
 	/** Message queue consumer manager */
-	private final MqConsumerManager mqConsumerManager;
+	private final RedissonConsumerManager mqConsumerManager;
 
 	/** Service for knowledge base operations */
 	private final KnowledgeBaseService knowledgeBaseService;

@@ -85,7 +85,7 @@
         WHERE experiment_id = #{experimentId}
         and evaluator_version_id = #{evaluatorVersionId}
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
 
     </select>
 

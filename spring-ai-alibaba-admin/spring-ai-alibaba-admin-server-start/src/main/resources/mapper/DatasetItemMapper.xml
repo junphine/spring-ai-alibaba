@@ -48,7 +48,7 @@
             </if>
         </where>
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- Query dataset item count -->
@@ -87,7 +87,7 @@
         FROM dataset_item
         WHERE dataset_id = #{datasetId} AND deleted = 0
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+        LOFFSET #{offset} LIMIT #{limit}
     </select>
 
     <!-- Find dataset items by dataset ID and item IDs with pagination -->
@@ -100,7 +100,7 @@
             #{itemId}
         </foreach>
         ORDER BY create_time DESC
-        LIMIT #{offset}, #{limit}
+         OFFSET #{offset} LIMIT #{limit}
     </select>
 
     <select id="selectByDatasetIdAndItemIds" resultMap="datasetItemResultMap">

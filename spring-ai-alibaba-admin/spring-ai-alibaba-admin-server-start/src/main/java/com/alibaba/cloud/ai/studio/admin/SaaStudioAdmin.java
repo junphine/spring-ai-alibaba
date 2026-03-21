@@ -23,6 +23,7 @@ import com.alibaba.cloud.ai.studio.core.config.StudioProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -42,6 +43,7 @@ import ch.qos.logback.core.boolex.*;
  */
 @SpringBootApplication
 @MapperScan("com.alibaba.cloud.ai.studio.admin.mapper")
+@EntityScan(basePackages = "com.alibaba.cloud.ai.studio.admin.entity")
 @ComponentScan(basePackages = { "com.alibaba.cloud.ai.studio" },
 		excludeFilters = {
 				@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
