@@ -15,8 +15,8 @@
         <java.version>17</java.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spring-ai-alibaba.version>1.0.0.4</spring-ai-alibaba.version>
-        <spring-boot.version>3.3.6</spring-boot.version>
+        <spring-ai-alibaba.version>1.1.2.2</spring-ai-alibaba.version>
+        <spring-boot.version>3.4.5</spring-boot.version>
         <nacos-client.version>3.0.3</nacos-client.version>
         <commons-lang3.version>3.11</commons-lang3.version>
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -25,10 +25,10 @@
         <slf4j.version>2.0.7</slf4j.version>
         <reactor.version>3.6.9</reactor.version>
         <reactor-netty.version>1.2.0</reactor-netty.version>
-        <logback.version>1.5.8</logback.version>
+        <logback.version>1.5.18</logback.version>
         <protobuf-java.version>3.19.6</protobuf-java.version>
         <druid.version>1.2.20</druid.version>
-        <redisson.version>3.27.2</redisson.version>
+        <redisson.version>3.42.0</redisson.version>
         <mysql.version>8.0.33</mysql.version>
         <argon2.version>2.11</argon2.version>
         <rocketmq-client.version>5.0.7</rocketmq-client.version>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-graph-core</artifactId>
-            <version>1.0.0.4</version>
+            <version>${spring-ai-alibaba.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-io</groupId>
@@ -277,7 +277,7 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-autoconfigure-arms-observation</artifactId>
-            <version>1.0.0.4</version>
+            <version>${spring-ai-alibaba.version}</version>
         </dependency>
 
         <dependency>
@@ -309,6 +309,12 @@
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-admin-server-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter-builtin-nodes</artifactId>
+            <version>1.1.2.2</version>
+            <scope>compile</scope>
         </dependency>
 
 

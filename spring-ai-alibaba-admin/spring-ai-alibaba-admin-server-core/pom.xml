@@ -98,7 +98,7 @@
 
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-core</artifactId>
+            <artifactId>spring-ai-alibaba-graph-core</artifactId>
         </dependency>
 
         <dependency>
@@ -244,6 +244,12 @@
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
             <artifactId>mcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-dashscope</artifactId>
+            <version>1.1.2.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

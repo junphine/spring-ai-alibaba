@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-
+import ch.qos.logback.core.boolex.*;
 
 /**
  * Main entry point for the Spring AI Alibaba Studio application.
